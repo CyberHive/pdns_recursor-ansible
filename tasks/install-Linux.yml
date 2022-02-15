@@ -36,3 +36,17 @@
       set_fact:
         _pdns_rec_version: "{{ _pdns_rec_ver_output['stdout'] | regex_replace('-[.\\d\\w]+$', '') }}"
       when: not ansible_check_mode
+
+
+- name: Populate service facts
+  service_facts:
+
+- name: Disable service systemd-resolved if present
+  systemd:
+    name: systemd-resolved
+    state: stopped
+    enabled: false
+  when: "'systemd-resolved.service' in services"
+
+- name: Set local dns resolver
+  command: echo "nameserver 127.0.0.1" > /etc/resolv.conf
